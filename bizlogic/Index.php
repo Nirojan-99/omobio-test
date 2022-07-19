@@ -1,6 +1,7 @@
 <?php
 
 include "db.php";
+session_start();
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Headers: *");
@@ -14,22 +15,21 @@ switch ($method) {
     case 'POST':
         $user = json_decode(file_get_contents('php://input'));
         $sql = "SELECT * FROM Exam WHERE email LIKE '$user->email' AND password LIKE '$user->password' ";
-        $stmt = $conn->prepare($sql);
-        if ($stmt->execute()) {
-            $data = ['status' => 1, 'message' => ""];
-        } else {
-            $data = ['status' => 0, 'message' => "Failed to login"];
+        $result = mysqli_query($conn, $sql);
+        if (mysqli_affected_rows($conn) > 0) {
+            $obj = mysqli_fetch_object($result);
+            $_SESSION['id'] = $obj->id;
+            echo json_encode($obj);
         }
-        echo json_encode($data);
         break;
     case 'GET':
         $user = json_decode(file_get_contents('php://input'));
-        $sql = "SELECT * FROM Exam WHERE id LIKE '$user->id' ";
-        $stmt = $conn->prepare($sql);
-        if ($stmt->execute()) {
-            $data = ['status' => 1, 'message' => ""];
-        } else {
-            $data = ['status' => 0, 'message' => "Failed to fectch data"];
+        $id = $_SESSION['id'];
+        $sql = "SELECT * FROM Exam WHERE id LIKE '$id' ";
+        $result = mysqli_query($conn, $sql);
+        if (mysqli_affected_rows($conn) > 0) {
+            $obj = mysqli_fetch_object($result);
+            echo json_encode($obj);
         }
         break;
 }
