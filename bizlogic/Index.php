@@ -20,6 +20,8 @@ switch ($method) {
             $obj = mysqli_fetch_object($result);
             $_SESSION['id'] = $obj->id;
             echo json_encode($obj);
+        } else {
+            throw new Exception("Invalid password");
         }
         break;
     case 'GET':
